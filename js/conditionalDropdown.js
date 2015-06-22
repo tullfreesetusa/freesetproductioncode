@@ -1,4 +1,4 @@
-function conditionalDropdown(id_parent,id_child,children_object,parent_matching,child_matching,parent_default,child_default){
+function conditionalDropdown(id_parent,id_child,children_object,parent_matching,child_matching,child_default){
   var parent=document.getElementById(id_parent);
   var child=document.getElementById(id_child);
   var parent_value=parent.options[parent.selectedIndex].value;
@@ -19,6 +19,9 @@ function conditionalDropdown(id_parent,id_child,children_object,parent_matching,
       new_option.text=children_object[new_child_id];
       new_option.value=new_child_id;
       child.add(new_option);
+      if(new_child_id==child_default){
+        child.selectedIndex=i;
+      }
     }
   }  
 }

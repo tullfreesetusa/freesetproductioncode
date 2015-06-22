@@ -22,7 +22,8 @@ $doctype_string='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 if($doctype==true)
   echo $doctype_string;
 function makeInputTextField($description,$sql_field,$product_row){
-  echo '<td>'.$description.'</td><td><input type="text" name="'.$sql_field.'" id="'.$sql_field.'" value="'.$product_row[$sql_field].'"></td>';
+  echo '<td>'.$description.'</td><td><input type="text" name="'.$sql_field.'" id="'.$sql_field.'" value="'.$product_row[$sql_field].'"
+    onchange=""></td>';
 }
 function makeGenericTextField($sql_field,$row,$size,$disabled){
   echo '<td><input type="text" size="'.$size.'" name="'.$sql_field.'" id="'.$sql_field.'" value="'.$row[$sql_field].'"';
@@ -31,8 +32,8 @@ function makeGenericTextField($sql_field,$row,$size,$disabled){
   }
   echo '></td>';
 }
-function makeFabricOptionList($sql_field,$product_row,$fabric_array){
-  echo '<select id="'.$sql_field.'_fabric" name="'.$sql_field.'_fabric"';
+function makeFabricOptionList($sql_field,$product_row,$fabric_array,$on_change){
+  echo '<select onchange="'.$on_change.'" id="'.$sql_field.'_fabric" name="'.$sql_field.'_fabric"';
   if(!isset($product_row[$sql_field."_fabric"]))
     echo ' disabled';
   echo'><option value="0"></option>';
@@ -61,12 +62,12 @@ function makeColorOptionList($sql_field,$product_row,$color_array){
   if(!isset($product_row[$sql_field."_color"]))
     echo ' disabled';
   echo'><option value="0"></option>';
-  foreach($color_array as $id => $color){
+  /*foreach($color_array as $id => $color){
     echo '<option value="'.$id.'"';
     if($product_row[$sql_field."_color"]==$id)
       echo " selected";
     echo '>'.$color.'</option>';
-  }
+  } */
   echo '</select>';
 }
 function makeGenericOptionList($default,$sql_field,$id_array,$null_option){
@@ -96,13 +97,22 @@ function makeStatusOptionList($default,$sql_field,$status_rows,$is_validated){
   $option_list=$option_list.'</select>';
   return $option_list;
 }
-function makeFullOptionList($sql_field,$product_row,$color_array,$fabric_array){
-  makeFabricOptionList($sql_field,$product_row,$fabric_array);
+function makeFullOptionList($sql_field,$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string){
+  echo '<script type="text/javascript">
+    var children_object='.$children_object_string.';
+    var p_match='.$p_match_string.';
+    var c_match='.$c_match_string.';
+    </script>';
+  $on_change="conditionalDropdown('".$sql_field."_fabric','".$sql_field."_color',children_object,p_match,c_match,".$product_row[$sql_field."_color"].");";
+  makeFabricOptionList($sql_field,$product_row,$fabric_array,$on_change);
   makeColorOptionList($sql_field,$product_row,$color_array);
   echo '<input type="checkbox" name="'.$sql_field.'_enabled" id="'.$sql_field.'_enabled" onclick="disableFabricSelectBox(\''.$sql_field.'\');"';
   if(isset($product_row[$sql_field."_color"])&&isset($product_row[$sql_field."_fabric"]))
     echo ' checked';
   echo '>';
+  echo '<script type="text/javascript">
+    '.$on_change.'
+    </script>';
 }
 function makeAccessoryOptionList($default_accessory,$default_count,$accessory_array){
   echo '<input style="width:25px" type="text" name="accessories_counts[]"';

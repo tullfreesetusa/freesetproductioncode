@@ -39,6 +39,37 @@ $submitted=$_GET["submitted"];
   while($row=$result4->fetch_assoc()){
     $accessory_array[$row["id_accessory"]]=$row["accessory_name"];
   }
+
+  //Conditional Dropdown Stuffs
+  $query="SELECT * FROM ".$database_table_prefix."fabrics_colors";
+  //echo $query;
+  $result5=$db_conn->query($query);
+  $matching_array=array();
+  while($matching_row=$result5->fetch_assoc()){
+    if (!isset($matching_array[$matching_row["id_fabric"]])){
+      $matching_array[$matching_row["id_fabric"]]=array();
+    }
+    array_push($matching_array[$matching_row["id_fabric"]],$matching_row["id_color"]);
+  } 
+  $children_object_string='{';
+  foreach($color_array as $id=>$name){
+    $children_object_string=$children_object_string.$id.':"'.$name.'",';
+  }
+  $children_object_string=rtrim($children_object_string," ,");
+  $children_object_string=$children_object_string.'}';
+  $p_match_string='[';
+  $c_match_string='[';
+  
+  foreach($matching_array as $id_fabric=>$colors_array){
+    foreach($colors_array as $id_color){
+      $p_match_string=$p_match_string.$id_fabric.',';
+      $c_match_string=$c_match_string.$id_color.',';
+    }
+  }
+  $p_match_string=rtrim($p_match_string," ,");
+  $c_match_string=rtrim($c_match_string," ,");
+  $p_match_string=$p_match_string.']';
+  $c_match_string=$c_match_string.']';
 ?>
 <html>
 <head>
@@ -104,6 +135,7 @@ function disableUploadBox(){
   }
 }
 </script>
+<script type="text/javascript" src="/js/conditionalDropdown.js"></script>
 <title>
 <?php echo $product_number." - "; ?>Freeset Order Management
 </title>
@@ -151,19 +183,19 @@ function disableUploadBox(){
 <hr>
 <table class="fabric_details" cellpadding="5">
 <tr><td>Front Fabric:</td>
-<td><?php makeFullOptionList("front",$product_row,$color_array,$fabric_array);?></td>
+<td><?php makeFullOptionList("front",$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string);?></td>
 </tr>
 <tr><td>Gusset Fabric:</td>
-<td><?php makeFullOptionList("gusset",$product_row,$color_array,$fabric_array);?></td>
+<td><?php makeFullOptionList("gusset",$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string);?></td>
 </tr>
 <tr><td>Flap Fabric:</td>
-<td><?php makeFullOptionList("flap",$product_row,$color_array,$fabric_array);?></td>
+<td><?php makeFullOptionList("flap",$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string);?></td>
 </tr>
 <!--<tr><td>Handle Fabric:</td>
-<td><?php makeFullOptionList("handle",$product_row,$color_array,$fabric_array);?></td>
+<td><?php makeFullOptionList("handle",$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string);?></td>
 </tr>-->
 <tr><td>Lining Fabric:</td>
-<td><?php makeFullOptionList("lining",$product_row,$color_array,$fabric_array);?></td>
+<td><?php makeFullOptionList("lining",$product_row,$color_array,$fabric_array,$children_object_string,$p_match_string,$c_match_string);?></td>
 </tr>
 </table>
 <hr>

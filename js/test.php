@@ -17,10 +17,18 @@ require_once("../header.php");
   $result3=$db_conn->query($query);
   $matching_array=array();
   while($row=$result3->fetch_assoc()){
-    $matching_array[$row["id_fabric"]]=$row["id_color"];
-    echo $row["id_fabric"];
+    if (!isset($matching_array[$row["id_fabric"]])){
+      $matching_array[$row["id_fabric"]]=array();
+    }
+    array_push($matching_array[$row["id_fabric"]],$row["id_color"]);
+    /*foreach($matching_array as $fabric_id=>$color_array){
+      echo '1: ';
+      foreach($color_array as $color){
+        echo $color.',';
+      }
+      echo "<br>";
+    }*/      
   }
-  
   $children_object_string='{';
   foreach($color_array as $id=>$name){
     $children_object_string=$children_object_string.$id.':"'.$name.'",';
@@ -29,9 +37,11 @@ require_once("../header.php");
   $children_object_string=$children_object_string.'}';
   $p_match_string='[';
   $c_match_string='[';
-  foreach($matching_array as $id_fabric=>$id_color){
-    $p_match_string=$p_match_string.$id_fabric.',';
-    $c_match_string=$c_match_string.$id_color.',';
+  foreach($matching_array as $id_fabric=>$color_array){
+    foreach($color_array as $id_color){
+      $p_match_string=$p_match_string.$id_fabric.',';
+      $c_match_string=$c_match_string.$id_color.',';
+    }
   }
   $p_match_string=rtrim($p_match_string," ,");
   $c_match_string=rtrim($c_match_string," ,");
@@ -49,7 +59,7 @@ require_once("../header.php");
 </script>
 </head>
 <body>
-<select id="parent_test" onchange="conditionalDropdown('parent_test','child_test',children_object,p_match,c_match,'','')">
+<select id="parent_test" onchange="conditionalDropdown('parent_test','child_test',children_object,p_match,c_match,'')">
 <?php
   foreach($fabric_array as $id=>$name)
     echo '<option value="'.$id.'">'.$name.'</option>';
@@ -57,6 +67,9 @@ require_once("../header.php");
 </select>
 <select id="child_test">
 </select>
+<script>
+conditionalDropdown('parent_test','child_test',children_object,p_match,c_match,'');
+</script>
 </body>
 </html>
 <?php
